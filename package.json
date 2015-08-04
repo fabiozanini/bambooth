@@ -33,7 +33,7 @@
     "electron-prebuilt": "^0.25.2"
   },
   "dependencies": {
-    "node-jsx": "^0.13.3",
+    "node-cjsx": "^1.0.0",
     "react": "^0.13.3"
   }
 }
