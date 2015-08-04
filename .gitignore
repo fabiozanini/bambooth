@@ -1,0 +1,20 @@
+# The example app from ragingwind
+electron-electrolysis
+
+# NPM and BOWER
+node_modules
+build
+bower_components
+
+# VIM
+.*.sw[a-z]
+*.un~
+Session.vim
+.netrwhist
+
+# Linux
+.*
+!.gitignore
+*~
+
+
