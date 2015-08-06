@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Bambooth</title>
     <link rel="stylesheet" href="index.css">
-    <link rel="import" href="./components/message-label.html">
+    <link rel="import" href="./renderer/components/message-label.html">
   </head>
   <body>
     <div class="container">
@@ -19,8 +19,8 @@
     </div>
   </body>
   <script>
-// main process code
+// renderer process code
 require('node-cjsx').transform();
-require('./renderer.cjsx');
+require('./renderer/main.cjsx');
   </script>
 </html>
