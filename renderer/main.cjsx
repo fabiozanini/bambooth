@@ -3,27 +3,6 @@ ReactLabel = require './components/react-label'
 PolymerLabel = require './components/polymer-label'
 
 
-# Menu
-remote = require 'remote'
-app = remote.require 'app'
-Menu = remote.require 'menu'
-template = [
-  {
-    label: "Bambooth"
-    type: "submenu"
-    submenu: [
-      {
-        label: "Quit"
-        click: ->
-          app.quit()
-      }
-    ]
-  }
-]
-menu = Menu.buildFromTemplate template
-Menu.setApplicationMenu menu
-
-
 # React components
 start = new Date().getTime()
 setInterval ->

@@ -8,6 +8,22 @@ require('crash-reporter').start()
 mainWindow = null
 
 main = ->
+  # Menu
+  Menu = require 'menu'
+  template = [
+    {
+      label: "Bambooth"
+      submenu: [
+        {
+          label: "Quit"
+          click: ->
+            app.quit()
+        }
+      ]
+    }
+  ]
+  menu = Menu.buildFromTemplate template
+
   app.on 'window-all-closed', ->
     if process.platform != 'darwin'
       app.quit()
@@ -18,6 +34,8 @@ main = ->
       height: 600,
       resizable: true
     }
+
+    Menu.setApplicationMenu menu
     
     # WARN: Inspect window should be opened before loading URL
     mainWindow.openDevTools()
