@@ -40,7 +40,7 @@ main = ->
     # WARN: Inspect window should be opened before loading URL
     mainWindow.openDevTools()
   
-    mainWindow.loadUrl "file://"+__dirname+"/index.html"
+    mainWindow.loadUrl "file://"+__dirname+"/renderer/index.html"
 
     mainWindow.on 'closed', ->
       # deref the window

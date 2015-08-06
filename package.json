@@ -19,8 +19,8 @@
   },
   "files": [
     "index.js",
-    "index.html",
-    "index.css"
+    "renderer/index.html",
+    "renderer/index.css"
   ],
   "keywords": [
     "electron",
