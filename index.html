@@ -1,25 +1,26 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Electron boilerplate</title>
-		<link rel="stylesheet" href="index.css">
-		<link rel="import" href="./components/message-label.html">
-	</head>
-	<body>
-		<div class="container">
-			<header>
-				<h1>Electron boilerplate!!!</h1>
-			</header>
-			<section class="main">
+  <head>
+    <meta charset="utf-8">
+    <title>Bambooth</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="import" href="./components/message-label.html">
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Bambooth</h1>
+      </header>
+      <section class="main">
         <div id="react-container"></div>
         <div id="polymer-container"></div>
       </section>
-			<footer></footer>
-		</div>
-	</body>
-	<script>
-    require('node-cjsx').transform();
-    require('./main.cjsx');
+      <footer></footer>
+    </div>
+  </body>
+  <script>
+// main process code
+require('node-cjsx').transform();
+require('./renderer.cjsx');
   </script>
 </html>
