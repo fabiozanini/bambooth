@@ -15,6 +15,12 @@ main = ->
       label: "Bambooth"
       submenu: [
         {
+          label: "Toggle sidebar"
+          accelerator: 'CmdOrCtrl+B'
+          click: ->
+            mainWindow.webContents.send "sidebar", "toggle"
+        },
+        {
           label: "Quit"
           click: ->
             app.quit()
