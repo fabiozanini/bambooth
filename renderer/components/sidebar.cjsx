@@ -15,10 +15,35 @@ Sidebar = React.createClass {
 
   render: ->
     return (
-      <div className="menu">
+      <div className="sidebar">
         <div className={(if @state.visible then "visible " else "") + "left"}>{@props.children}</div>
       </div>
     )
 }
 
-module.exports = Sidebar
+Main = React.createClass {
+  getInitialState: ->
+    return {shrunk: true}
+
+  shrink: ->
+    @setState {shrunk: true}
+
+  widen: ->
+    @setState {shrunk: false}
+
+  toggle: ->
+    if @state.shrunk then @widen() else @shrink()
+
+  render: ->
+    return (
+      <div className="main">
+        <div className={(if @state.shrunk then "shrunk" else "")}>
+          {@props.children} 
+        </div>
+      </div>
+    )
+}
+
+module.exports =
+  "Sidebar": Sidebar
+  "Main": Main

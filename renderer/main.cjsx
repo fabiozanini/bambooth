@@ -1,19 +1,25 @@
+# Communication with the main electron process
+ipc = require 'ipc'
+
+# React components
 React = require 'react'
 SidebarItem = require './components/sidebar-item'
-Sidebar = require './components/sidebar'
+Sidebar = (require './components/sidebar').Sidebar
+Main = (require './components/sidebar').Main
 
 ReactLabel = require './components/react-label'
 PolymerLabel = require './components/polymer-label'
 
 
-# React components
-
-
+# Main component
 App = React.createClass {
   componentWillMount: ->
-    require('ipc').on('sidebar', (msg) =>
+    ipc.on('sidebar', (msg) =>
       switch msg
-        when "toggle" then @refs.sidebar.toggle()
+        when "toggle" then (
+          @refs.sidebar.toggle()
+          @refs.main.toggle()
+        )
         else console.log msg
     )
 
@@ -24,7 +30,7 @@ App = React.createClass {
           <SidebarItem hash="first-page">First Page</SidebarItem>
           <SidebarItem hash="second-page">Second Page</SidebarItem>
         </Sidebar>
-        <div ref="main" className="container">
+        <Main ref="main">
           <header>
             <h1>Bambooth</h1>
           </header>
@@ -32,13 +38,14 @@ App = React.createClass {
             <div id="react-container"></div>
             <div id="polymer-container"></div>
           </section>
-          <footer></footer>
-        </div>
+          <footer></footer> 
+        </Main>
       </div>
     )
 }
 
 React.render <App />, document.getElementById 'app'
+
 
 # Timer
 start = new Date().getTime()

@@ -5,23 +5,12 @@
     <title>Bambooth</title>
     <link rel="import" href="../bower_components/polymer/polymer.html">
     <link rel="import" href="./components/message-label.html">
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="menu.less">
+    <link rel="stylesheet" href="index.less">
   </head>
   <body>
     <div id="app"></div>
-      <!--
-      <header>
-        <h1>Bambooth</h1>
-      </header>
-        <div id="react-container"></div>
-        <div id="polymer-container"></div>
-        -->
-      <!--
-      <footer></footer>
-      -->
     <script>
-      // renderer process code
+      // renderer process code (ReactJS app)
       require('node-cjsx').transform();
       require('./main.cjsx');
     </script>
