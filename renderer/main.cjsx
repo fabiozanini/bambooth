@@ -6,28 +6,12 @@ React = require 'react'
 SidebarItem = require './components/sidebar-item'
 Sidebar = (require './components/sidebar').Sidebar
 Main = (require './components/sidebar').Main
+AddButton = require './components/add-button'
 
 ReactLabel = require './components/react-label'
 PolymerLabel = require './components/polymer-label'
 
 
-AddButton = React.createClass {
-  getInitialState: ->
-    {
-      "clickCallback": -> console.log "add note"
-    }
-
-  render: ->
-    return (
-      <div id="new-note-btn">
-        <img id="new-note-btn-img"
-             src={"./images/plus.png"}
-             onClick={@state.clickCallback}
-        >
-        </img>
-      </div>
-    )
-}
 
 # Main component
 App = React.createClass {

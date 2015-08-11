@@ -21,6 +21,26 @@
   -moz-box-sizing:border-box;
 }
 
+.box-shadow (@value1,@value2:X,...) {
+  @value: ~`"@{arguments}".replace(/[\[\]]|\,\sX/g, '')`;
+  -webkit-box-shadow: @value;
+  -moz-box-shadow: @value;
+  -ms-box-shadow: @value;
+  -o-box-shadow: @value;
+  box-shadow: @value;
+}
+
+.border-radius (@value1,@value2:X,...) {
+  @value: ~`"@{arguments}".replace(/[\[\]]|\,\sX/g, '')`;
+  -webkit-border-radius: @value;
+  -moz-border-radius: @value;
+  -ms-border-radius: @value;
+  -o-border-radius: @value;
+  border-radius: @value;
+}
+
+
+
 html,
 body {
   font-family:Arial;
@@ -35,6 +55,7 @@ body {
   @sidebar-width-res:20px;
   @new-note-margin:20px;
   @shadow-color: #666666;
+  @main-color: #d4ff2a;
 
   .sidebar {
     display:block;
@@ -42,13 +63,15 @@ body {
       position:absolute;
       z-index:2;
       top:0;
-      width:@sidebar-width;
+      width:@sidebar-width - 1px;
       height:100%;
       .border-box;
       .transition(-webkit-transform ease 250ms);
       .transition(transform ease 250ms);
+      .box-shadow(1px 6px 6px @shadow-color);
+
       &.left {
-        background:#374400;
+        background: @main-color;
         left:(@sidebar-width - @sidebar-width-res)*-1;
       }
       &.visible.left {
@@ -63,9 +86,9 @@ body {
 	border-bottom:solid 1px #555;
 	cursor:pointer;
 	.border-box;
-	color:#B0B0B0;
+	color: black;
         &:hover {
-	  color:#F0F0F0;
+	  color: @shadow-color;
 	}
         >span {
 	  float:left;
@@ -114,19 +137,19 @@ body {
     margin-right: @new-note-margin+5px;
 
     #new-note-btn-img {
-      -webkit-border-radius: 24px;
-      -webkit-box-shadow: 0 3px 3px @shadow-color;
-      .transition(all 250ms linear);
+      .border-radius(24px);
+      .box-shadow(0 3px 3px @shadow-color);
+      .transition(all 150ms ease);
 
       &:hover {
-        -webkit-box-shadow: 0 5px 5px @shadow-color;
-        .transition(all 250ms linear);
+        .box-shadow(0 5px 5px @shadow-color);
+        .transition(all 250ms ease);
         .transform(translateY(-5px));
       }
     
       &:active {
-        -webkit-box-shadow: 0 9px 9px @shadow-color;
-        .transition(all 30ms linear);
+        .box-shadow(0 9px 9px @shadow-color);
+        .transition(all 30ms ease);
         .transform(translateY(-9px));
       }
     }
