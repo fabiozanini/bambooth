@@ -11,6 +11,24 @@ ReactLabel = require './components/react-label'
 PolymerLabel = require './components/polymer-label'
 
 
+AddButton = React.createClass {
+  getInitialState: ->
+    {
+      "clickCallback": -> console.log "add note"
+    }
+
+  render: ->
+    return (
+      <div id="new-note-btn">
+        <img id="new-note-btn-img"
+             src={"./images/plus.png"}
+             onClick={@state.clickCallback}
+        >
+        </img>
+      </div>
+    )
+}
+
 # Main component
 App = React.createClass {
   componentWillMount: ->
@@ -23,28 +41,37 @@ App = React.createClass {
         else console.log msg
     )
 
+
+  componentDidMount: ->
+    @refs.addButton.setState {
+      "clickCallback": -> console.log "changed!"
+    }
+
   render: ->
     return (
       <div>
-        <Sidebar ref="sidebar">
-          <SidebarItem hash="first-page">First Page</SidebarItem>
-          <SidebarItem hash="second-page">Second Page</SidebarItem>
-        </Sidebar>
-        <Main ref="main">
-          <header>
-            <h1>Bambooth</h1>
-          </header>
-          <section>
-            <div id="react-container"></div>
-            <div id="polymer-container"></div>
-          </section>
-          <footer></footer> 
-        </Main>
+        <div>
+          <Sidebar ref="sidebar">
+            <SidebarItem hash="first-notebook">My Notebook</SidebarItem>
+          </Sidebar>
+          <Main ref="main">
+            <header>
+              <h1>Bambooth</h1>
+            </header>
+            <section>
+              <div id="react-container"></div>
+              <div id="polymer-container"></div>
+            </section>
+            <footer></footer>
+          </Main>
+        </div>
+        <AddButton ref="addButton"/>
       </div>
     )
 }
 
 React.render <App />, document.getElementById 'app'
+
 
 
 # Timer
