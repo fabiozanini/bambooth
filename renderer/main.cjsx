@@ -7,10 +7,10 @@ SidebarItem = require './components/sidebar-item'
 Sidebar = (require './components/sidebar').Sidebar
 Main = (require './components/sidebar').Main
 AddButton = require './components/add-button'
+Note = require './components/note'
 
 ReactLabel = require './components/react-label'
 PolymerLabel = require './components/polymer-label'
-
 
 
 # Main component
@@ -20,7 +20,7 @@ App = React.createClass {
       switch msg
         when "toggle" then (
           @refs.sidebar.toggle()
-          @refs.main.toggle()
+          @refs.main.toggleSidebar()
         )
         else console.log msg
     )
@@ -28,7 +28,9 @@ App = React.createClass {
 
   componentDidMount: ->
     @refs.addButton.setState {
-      "clickCallback": -> console.log "changed!"
+      "clickCallback": =>
+        console.log "changed!"
+        @refs.main.addNote()
     }
 
   render: ->
@@ -39,14 +41,6 @@ App = React.createClass {
             <SidebarItem hash="first-notebook">My Notebook</SidebarItem>
           </Sidebar>
           <Main ref="main">
-            <header>
-              <h1>Bambooth</h1>
-            </header>
-            <section>
-              <div id="react-container"></div>
-              <div id="polymer-container"></div>
-            </section>
-            <footer></footer>
           </Main>
         </div>
         <AddButton ref="addButton"/>
@@ -57,18 +51,19 @@ App = React.createClass {
 React.render <App />, document.getElementById 'app'
 
 
-
-# Timer
-start = new Date().getTime()
-setInterval ->
-
-  React.render(
-    <ReactLabel elapsed={new Date().getTime() - start} />,
-    document.getElementById 'react-container'
-  )
-
-  React.render(
-    <PolymerLabel elapsed={new Date().getTime() - start} />,
-    document.getElementById 'polymer-container'
-  )
-, 50
+# Old components
+#<div id="react-container"></div>
+#<div id="polymer-container"></div>
+#start = new Date().getTime()
+#setInterval ->
+#
+#  React.render(
+#    <ReactLabel elapsed={new Date().getTime() - start} />,
+#    document.getElementById 'react-container'
+#  )
+#
+#  React.render(
+#    <PolymerLabel elapsed={new Date().getTime() - start} />,
+#    document.getElementById 'polymer-container'
+#  )
+#, 50

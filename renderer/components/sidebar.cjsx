@@ -1,4 +1,5 @@
 React = require 'react'
+Note = require './note'
 
 Sidebar = React.createClass {
   getInitialState: ->
@@ -23,7 +24,13 @@ Sidebar = React.createClass {
 
 Main = React.createClass {
   getInitialState: ->
-    return {shrunk: true}
+    return {
+      shrunk: true
+      notes: [
+        {"content": "ciao ciao", "id": 0}
+      ]
+
+    }
 
   shrink: ->
     @setState {shrunk: true}
@@ -31,14 +38,24 @@ Main = React.createClass {
   widen: ->
     @setState {shrunk: false}
 
-  toggle: ->
+  toggleSidebar: ->
     if @state.shrunk then @widen() else @shrink()
+
+  addNote: ->
+    notes = @state.notes
+    notes.push {"id": notes.length, "content": "hej!"}
+    @setState {"notes": notes}
 
   render: ->
     return (
       <div className="main">
         <div className={(if @state.shrunk then "shrunk" else "")}>
-          {@props.children} 
+          <section>
+            {@state.notes.map (note) ->
+              <Note key=note.id content=note.content />
+            }
+          </section>
+          <footer></footer>
         </div>
       </div>
     )
