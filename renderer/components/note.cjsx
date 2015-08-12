@@ -21,14 +21,29 @@ Note = React.createClass {
 
   render: ->
     c = @props.content
-    return (
-      <div className="note"
-           onMouseEnter={@edit}
-           onMouseLeave={@lock}
-      >
-        {if @state.editable then <textarea ref="input" type="text" readOnly=false defaultValue=c /> else c}
-      </div>
-    )
+    if not @state.editable
+      return (
+        <div>
+          <div className="note"
+               onMouseEnter={@edit}
+               onMouseLeave={@lock}
+          >
+          {c}
+          </div>
+        </div>
+      )
+    else
+      return (
+        <div>
+          <textarea className="note"
+               onMouseEnter={@edit}
+               onMouseLeave={@lock}
+               type="text"
+               readOnly=false
+               defaultValue=c
+          />
+        </div>
+      )
 }
 
 module.exports = Note

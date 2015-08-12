@@ -17,8 +17,9 @@
 }
 
 .border-box {
- box-sizing:border-box;
+ -webkit-box-sizing: border-box;
  -moz-box-sizing:border-box;
+ box-sizing:border-box;
 }
 
 .box-shadow (@value1,@value2:X,...) {
@@ -112,29 +113,37 @@ body {
     margin-left: @sidebar-width
    }
 
-   div.note {
+   .note {
     border: 2px solid @shadow-color;
     .border-radius(5px);
     .box-shadow(4px 4px 4px @shadow-color);
     padding: 8px;
+
     // Space for the next note
     margin-bottom: 6px;
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+
     min-height: 70px;
     background: fade(@main-color, 20%);
+    width: 100%;
+    .border-box;
+   }
 
-    >textarea {
-     background-color: transparent;
-     border: 0px;
-     font-size: 14px;
-     font-family: 'Helvetica Neue', Helvetica, sans-serif;
-     padding: 0;
-     width: 100%;
-     height: 100%;
-     resize: none;
+   textarea.note {
+    font-size: 14px;
+    font-family: 'Helvetica Neue', Helvetica, sans-serif;
+    resize: none;
+    // NOTE: why 3px less margin??
+    margin-bottom: 3px + 2px;
 
-     &:focus {
-      outline:none;
-     }
+    .box-shadow(6px 6px 6px @shadow-color);
+    .transform(translateY(-2px));
+
+
+    &:focus {
+     outline:none;
     }
    }
   }
