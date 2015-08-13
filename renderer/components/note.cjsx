@@ -1,26 +1,29 @@
 React = require 'react'
+Actions = require '../actions'
 
 Note = React.createClass {
   getInitialState: ->
-    {editable: false}
+    {
+      editable: false
+      content: @props.noteContent
+    }
 
   edit: ->
     @setState {editable: true}
 
   lock: ->
-    # FIXME: we should save the new content of the note, but
-    # we probably want to do it via a global dispatcher because
-    # notes are now props of the parent and we do not want deep
-    # components to know too much:
-    # dispatch main, ->
-    #   updateNote @props.id, @children[0].value
+    # NOTE: this does NOT trigger a double update
+    # are we sure?
     @setState {editable: false}
+    Actions.updateNote @props.noteId, @state.content
 
   toggleEdit: ->
     if @state.editable then @lock() else @edit()
 
+  handleChange: (event) ->
+    @setState {content: event.target.value}
+
   render: ->
-    c = @props.content
     if not @state.editable
       return (
         <div>
@@ -28,7 +31,7 @@ Note = React.createClass {
                onMouseEnter={@edit}
                onMouseLeave={@lock}
           >
-          {c}
+          {@state.content}
           </div>
         </div>
       )
@@ -36,11 +39,12 @@ Note = React.createClass {
       return (
         <div>
           <textarea className="note"
+               ref="input"
                onMouseEnter={@edit}
                onMouseLeave={@lock}
                type="text"
-               readOnly=false
-               defaultValue=c
+               value={@state.content}
+               onChange={@handleChange}
           />
         </div>
       )

@@ -4,18 +4,23 @@ ipc = require 'ipc'
 # React components
 React = require 'react'
 SidebarItem = require './components/sidebar-item'
-Sidebar = (require './components/sidebar').Sidebar
-Main = (require './components/sidebar').Main
+Sidebar = require './components/sidebar'
+Main = require './components/main'
 AddButton = require './components/add-button'
 Note = require './components/note'
 
-ReactLabel = require './components/react-label'
-PolymerLabel = require './components/polymer-label'
+# Flux components
+Dispatcher = require './dispatcher'
+NoteStore = require './stores/notes'
+Actions = require './actions'
 
 
-# Main component
 App = React.createClass {
+  getInitialState: ->
+    {notes: NoteStore.getAll()}
+
   componentWillMount: ->
+    # Toggle sidebar via menu
     ipc.on('sidebar', (msg) =>
       switch msg
         when "toggle" then (
@@ -25,13 +30,17 @@ App = React.createClass {
         else console.log msg
     )
 
-
   componentDidMount: ->
-    @refs.addButton.setState {
-      "clickCallback": =>
-        console.log "changed!"
-        @refs.main.addNote()
-    }
+    NoteStore.addChangeListener @_onChange
+
+  componentWillUnmount: ->
+    NoteStore.removeChangeListener @_onChange
+
+  _onChange: ->
+    # On change, we regenerate the whole view
+    # (React will take care of what needs rendering via
+    # its fast diff algorithm)
+    @setState {notes: NoteStore.getAll()}
 
   render: ->
     return (
@@ -40,18 +49,27 @@ App = React.createClass {
           <Sidebar ref="sidebar">
             <SidebarItem hash="first-notebook">My Notebook</SidebarItem>
           </Sidebar>
-          <Main ref="main">
+          <Main ref="main" notes={@state.notes}>
           </Main>
         </div>
-        <AddButton ref="addButton"/>
+        <AddButton ref="addButton" addNote={@_addNote}/>
       </div>
     )
+
+  _addNote: ->
+    Actions.createNote("")
+    # FIXME: we should focus on the new note, but somehow there
+    # are synchronicity problems with render()
+
+
 }
 
 React.render <App />, document.getElementById 'app'
 
 
 # Old components
+#ReactLabel = require './components/react-label'
+#PolymerLabel = require './components/polymer-label'
 #<div id="react-container"></div>
 #<div id="polymer-container"></div>
 #start = new Date().getTime()

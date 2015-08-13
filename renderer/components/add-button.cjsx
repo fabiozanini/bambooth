@@ -1,21 +1,18 @@
 React = require 'react'
+Actions = require '../actions'
 
 AddButton = React.createClass {
-  getInitialState: ->
-    {
-      "clickCallback": -> console.log "add note"
-    }
-
   render: ->
     return (
       <div id="new-note-btn">
         <img id="new-note-btn-img"
              src={"./images/plus.png"}
-             onClick={@state.clickCallback}
+             onClick={@props.addNote}
         >
         </img>
       </div>
     )
+
 }
 
 module.exports = AddButton
