@@ -52,7 +52,7 @@ App = React.createClass {
           <Main ref="main" notes={@state.notes}>
           </Main>
         </div>
-        <AddButton ref="addButton" addNote={@_addNote}/>
+        <AddButton ref="addButton" addNote={@_addNote} />
       </div>
     )
 

@@ -2,16 +2,24 @@ Dispatcher = require '../dispatcher'
 EventEmitter = require('events').EventEmitter
 assign = require('object-assign')
 
-_notes = [
-  {id: 0, content: "ciao ciao hej"}
-]
+Data = require('remote').require('./data')
+
+_notes = Data.loadNotes()
+
+saveAllToFile = ->
+  Data.saveNotes _notes
 
 create = (content) ->
-  id = _notes.length
+  ids = (note.id for note in _notes)
+  ids.sort()
+  id = 0
+  while ids.indexOf(id) != -1
+    id += 1
   _notes.push {
     "id": id
     "content": content
   }
+  saveAllToFile()
 
 update = (id, updates) ->
   for note in _notes
@@ -19,9 +27,13 @@ update = (id, updates) ->
       for key, value of updates
         note[key] = value
       break
+  saveAllToFile()
 
 destroy = (id) ->
-  delete _todos[id]
+  for note, i in _notes
+    if note.id == id
+      delete _notes[i]
+  saveAllToFile()
 
 
 NoteStore = assign({}, EventEmitter.prototype, {

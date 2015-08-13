@@ -1,3 +1,4 @@
+# Electron imports
 app = require 'app'
 BrowserWindow = require 'browser-window'
 

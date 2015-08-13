@@ -1,12 +1,17 @@
 React = require 'react'
 Actions = require '../actions'
+RemoveButton = require './remove-button'
 
 Note = React.createClass {
   getInitialState: ->
     {
       editable: false
       content: @props.noteContent
+      position: null
     }
+
+  componentDidMount: ->
+    @rect = React.findDOMNode(@refs.content).getBoundingClientRect()
 
   edit: ->
     @setState {editable: true}
@@ -23,13 +28,17 @@ Note = React.createClass {
   handleChange: (event) ->
     @setState {content: event.target.value}
 
+  _removeNote: ->
+    Actions.destroyNote @props.noteId
+
   render: ->
     if not @state.editable
       return (
-        <div>
+        <div onMouseEnter={@edit}
+             onMouseLeave={@lock}
+        >
           <div className="note"
-               onMouseEnter={@edit}
-               onMouseLeave={@lock}
+               ref="content"
           >
           {@state.content}
           </div>
@@ -37,14 +46,18 @@ Note = React.createClass {
       )
     else
       return (
-        <div>
+        <div onMouseEnter={@edit}
+             onMouseLeave={@lock}
+        >
           <textarea className="note"
-               ref="input"
-               onMouseEnter={@edit}
-               onMouseLeave={@lock}
+               ref="content"
                type="text"
                value={@state.content}
                onChange={@handleChange}
+          />
+          <RemoveButton ref="removeButton"
+                        top={@rect.top}
+                        removeNote={@_removeNote}
           />
         </div>
       )
