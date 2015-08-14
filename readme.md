@@ -1,6 +1,7 @@
 # Bambooth
+Note taking application à la Evernote for Linux.
 
-> Note taking application à la Evernote for Linux.
+> NOTE: the code is alpha quality for now, not ready for production. Expect breaking changes.
 
 ## Screenshot
 ![Bambooth screenshot](/bambooth.png)
