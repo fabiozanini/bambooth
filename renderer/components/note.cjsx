@@ -13,6 +13,9 @@ Note = React.createClass {
   componentDidMount: ->
     @rect = React.findDOMNode(@refs.content).getBoundingClientRect()
 
+  componentDidUpdate: ->
+    @rect = React.findDOMNode(@refs.content).getBoundingClientRect()
+
   edit: ->
     @setState {editable: true}
 

@@ -10,14 +10,22 @@ saveAllToFile = ->
   Data.saveNotes _notes
 
 create = (content) ->
+  # Find first unused id, to keep numbers small
   ids = (note.id for note in _notes)
   ids.sort()
   id = 0
   while ids.indexOf(id) != -1
     id += 1
+
+  # Date.now() gives back milliseconds, easy to JSON and
+  # JS can reconstruct easily with Date(<ms>)
+  d = Date.now()
+
   _notes.push {
     "id": id
     "content": content
+    "dateCreate": d
+    "dateModify": d
   }
   saveAllToFile()
 
@@ -26,13 +34,15 @@ update = (id, updates) ->
     if note.id == id
       for key, value of updates
         note[key] = value
+      note.dateModify = Date.now()
       break
   saveAllToFile()
 
 destroy = (id) ->
   for note, i in _notes
     if note.id == id
-      delete _notes[i]
+      _notes.splice(i, 1)
+      break
   saveAllToFile()
 
 
