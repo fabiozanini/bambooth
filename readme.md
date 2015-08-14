@@ -2,11 +2,14 @@
 
 > Note taking application à la Evernote for Linux.
 
+## Screenshot
+![Bambooth screenshot](/bambooth.png)
+
 ## How to use
 
 ```
 # install dependencies
-$ npm install && bower install polymer
+$ npm install
 
 # run
 $ npm start
