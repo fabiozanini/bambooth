@@ -6,6 +6,7 @@ require('crash-reporter').start()
 
 # Other modules for the main process
 About = require './about'
+EvernoteSync = require './evernote'
 
 # prevent window being GC'd
 mainWindow = null
@@ -23,9 +24,15 @@ main = ->
             mainWindow.webContents.send "sidebar", "toggle"
         },
         {
+          label: "Sync with Evernote"
+          accelerator: 'CmdOrCtrl+S'
+          click: ->
+            new EvernoteSync()
+        },
+        {
           label: "About"
           click: ->
-            About()
+            new About()
         },
         {
           label: "Quit"

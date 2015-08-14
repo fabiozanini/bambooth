@@ -3,7 +3,6 @@ fs = require 'fs'
 Config = require './config'
 
 
-
 class Data
   @loadNotes: ->
     JSON.parse fs.readFileSync Config.notesFile, 'utf8'

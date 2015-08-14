@@ -1,6 +1,9 @@
 osenv = require 'osenv'
 fs = require 'fs'
 
+getConfigFile = ->
+  fn = osenv.home() + '/.config/bambooth/config'
+
 getDataFolder = ->
   fn = osenv.home() + '/.local/share/bambooth'
   # Create data folder if not present
@@ -12,9 +15,30 @@ getNotesFile = ->
   getDataFolder() + '/notes.json'
 
 
-Config = {
+
+class Config
+  configFile: getConfigFile()
   dataFolder: getDataFolder()
   notesFile: getNotesFile()
-}
+  evernoteConfig: {}
 
-module.exports = Config
+  constructor: ->
+    if fs.existsSync(@configFile)
+      @readFromFile()
+
+  readFromFile: ->
+    config = JSON.parse fs.readFileSyc @configFile, 'utf8'
+    for key, value of config
+      this[key] = value
+
+  writeToFile: ->
+    config = {
+      notesFile: @notesFile
+      evernoteConfig: @evernoteConfig
+    }
+    fs.writeFile(@configFile,
+                 (JSON.stringify self, null, 2)
+                 {'encoding': 'utf8'})
+
+
+module.exports = new Config()
