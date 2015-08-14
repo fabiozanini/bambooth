@@ -1,13 +1,14 @@
-# Electron imports
 app = require 'app'
 BrowserWindow = require 'browser-window'
 
 # report crashes to the Electron project
 require('crash-reporter').start()
 
+# Other modules for the main process
+About = require './about'
+
 # prevent window being GC'd
 mainWindow = null
-
 main = ->
   # Menu
   Menu = require 'menu'
@@ -20,6 +21,11 @@ main = ->
           accelerator: 'CmdOrCtrl+B'
           click: ->
             mainWindow.webContents.send "sidebar", "toggle"
+        },
+        {
+          label: "About"
+          click: ->
+            About()
         },
         {
           label: "Quit"
@@ -37,8 +43,8 @@ main = ->
   
   app.on 'ready', ->
     mainWindow = new BrowserWindow {
-      width: 1200,
-      height: 600,
+      width: 1200
+      height: 600
       resizable: true
     }
 
