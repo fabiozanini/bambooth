@@ -12,10 +12,6 @@ EvernoteSync = require './evernote'
 mainWindow = null
 
 main = ->
-  #FIXME
-  EvernoteSync.tryAccess()
-  return null
-
   # Menu
   Menu = require 'menu'
   template = [
@@ -71,5 +67,6 @@ main = ->
       # deref the window
       # for multiple windows store them in an array
       mainWindow = null
+
 
 module?.exports = main

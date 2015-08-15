@@ -10,8 +10,6 @@ config = require './config'
 
 
 class EvernoteSync
-  constructor: ->
-
   tryAccess: ->
     if not ('oauthAccessToken' of config.evernoteConfig)
       @requestToken()
@@ -24,27 +22,16 @@ class EvernoteSync
       @access()
 
   access: ->
-      console.log 'accessToken: ' + config.evernoteConfig.oauthAccessToken
+    # NOTE: for some reason, we need to do the heavy-lifting for the
+    # synchronization in a child process. It is a good idea, but why
+    # does it not work otherwise?
+    @spawnChildProcess()
 
-      @client = new Evernote.Client {
-        token: config.evernoteConfig.oauthAccessToken
-        sandbox: true
-      }
-
-      # In theory, we do not need to repeat the noteStoreUrl,
-      # but in practice it does not work without
-      noteStoreUrl = config.evernoteConfig.edamNoteStoreUrl
-      @noteStore = @client.getNoteStore(noteStoreUrl)
-
-      # FIXME: we should check that we get really access
-
-      # Test call
-      @noteStore.listNotebooks (error, notebooks) ->
-        if error
-          console.log error
-        else
-          console.log notebooks
-
+  spawnChildProcess: ->
+    spawn = (require 'child_process').spawn
+    spawn('node',
+          ['evernote-child.js'],
+          {cwd: __dirname, stdio: 'inherit'})
 
   requestToken: ->
     @client = new Evernote.Client {
@@ -120,6 +107,8 @@ class EvernoteSync
       config.writeToFile()
 
       @window.close()
+
+      @tryAccess()
 
 
   openWindow: (options) ->
