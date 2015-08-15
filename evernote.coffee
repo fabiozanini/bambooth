@@ -11,24 +11,39 @@ config = require './config'
 
 class EvernoteSync
   constructor: ->
+
+  tryAccess: ->
     if not ('oauthAccessToken' of config.evernoteConfig)
       @requestToken()
 
+    # FIXME: we should check whether the token is too old
+    #else if tokenTooOld(config.evernoteConfig.oauthAccessToken)
+    #  @doSomething()
+
     else
-      console.log 'accessToken:' + config.evernoteConfig.oauthAccessToken
+      @access()
+
+  access: ->
+      console.log 'accessToken: ' + config.evernoteConfig.oauthAccessToken
 
       @client = new Evernote.Client {
         token: config.evernoteConfig.oauthAccessToken
+        sandbox: true
       }
 
-      @noteStore = @client.getNoteStore()
+      # In theory, we do not need to repeat the noteStoreUrl,
+      # but in practice it does not work without
+      noteStoreUrl = config.evernoteConfig.edamNoteStoreUrl
+      @noteStore = @client.getNoteStore(noteStoreUrl)
 
-      console.log @noteStore
+      # FIXME: we should check that we get really access
+
+      # Test call
       @noteStore.listNotebooks (error, notebooks) ->
         if error
           console.log error
         else
-          console.log notebooks.length
+          console.log notebooks
 
 
   requestToken: ->
@@ -58,6 +73,8 @@ class EvernoteSync
       @window.webContents.on 'did-get-redirect-request', @catchVerifier
 
   catchVerifier: (event, oldUrl, newUrl) =>
+    event.preventDefault()
+
     spliceUrl = (url) ->
       urlData = {}
       for datum in url.split "&"
@@ -125,4 +142,4 @@ class EvernoteSync
       @window.loadUrl options.url
     
 
-module.exports = EvernoteSync
+module.exports = new EvernoteSync()

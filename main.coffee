@@ -8,9 +8,14 @@ require('crash-reporter').start()
 About = require './about'
 EvernoteSync = require './evernote'
 
-# prevent window being GC'd
+# prevent from being GC'd
 mainWindow = null
+
 main = ->
+  #FIXME
+  EvernoteSync.tryAccess()
+  return null
+
   # Menu
   Menu = require 'menu'
   template = [
@@ -27,7 +32,7 @@ main = ->
           label: "Sync with Evernote"
           accelerator: 'CmdOrCtrl+S'
           click: ->
-            new EvernoteSync()
+            EvernoteSync.tryAccess()
         },
         {
           label: "About"
