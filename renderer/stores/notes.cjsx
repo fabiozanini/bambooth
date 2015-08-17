@@ -26,9 +26,10 @@ create = (content) ->
 
   _notes.push {
     "id": id
+    "title": "new note"
     "content": content
-    "dateCreate": d
-    "dateModify": d
+    "created": d
+    "updated": d
   }
   saveAllToFile()
 
@@ -37,7 +38,7 @@ update = (id, updates) ->
     if note.id == id
       for key, value of updates
         note[key] = value
-      note.dateModify = Date.now()
+      note.updated = Date.now()
       break
   saveAllToFile()
 
