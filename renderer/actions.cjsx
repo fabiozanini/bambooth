@@ -19,6 +19,11 @@ Actions = {
       actionType: "NOTE_DESTROY"
       id: id
     }
+
+  reloadNotes: ->
+    Dispatcher.dispatch {
+      actionType: "NOTE_LOADALL"
+    }
 }
 
 module.exports = Actions

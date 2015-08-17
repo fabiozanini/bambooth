@@ -15,6 +15,8 @@ NoteStore = require './stores/notes'
 Actions = require './actions'
 
 
+
+
 App = React.createClass {
   getInitialState: ->
     {notes: NoteStore.getAll()}
@@ -28,6 +30,13 @@ App = React.createClass {
           @refs.main.toggleSidebar()
         )
         else console.log msg
+    )
+
+    # Evernote sync
+    ipc.on('evernote', (msg) =>
+      switch msg
+        when "reload notes"
+          Actions.reloadNotes()
     )
 
   componentDidMount: ->
@@ -57,31 +66,10 @@ App = React.createClass {
     )
 
   _addNote: ->
-    Actions.createNote("")
+    Actions.createNote ""
     # FIXME: we should focus on the new note, but somehow there
     # are synchronicity problems with render()
-
 
 }
 
 React.render <App />, document.getElementById 'app'
-
-
-# Old components
-#ReactLabel = require './components/react-label'
-#PolymerLabel = require './components/polymer-label'
-#<div id="react-container"></div>
-#<div id="polymer-container"></div>
-#start = new Date().getTime()
-#setInterval ->
-#
-#  React.render(
-#    <ReactLabel elapsed={new Date().getTime() - start} />,
-#    document.getElementById 'react-container'
-#  )
-#
-#  React.render(
-#    <PolymerLabel elapsed={new Date().getTime() - start} />,
-#    document.getElementById 'polymer-container'
-#  )
-#, 50

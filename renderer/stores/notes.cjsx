@@ -4,7 +4,10 @@ assign = require('object-assign')
 
 Data = require('remote').require('./data')
 
-_notes = Data.loadNotes()
+_notes = []
+
+loadAll = ->
+  _notes = Data.loadNotes()
 
 saveAllToFile = ->
   Data.saveNotes _notes
@@ -45,7 +48,6 @@ destroy = (id) ->
       break
   saveAllToFile()
 
-
 NoteStore = assign({}, EventEmitter.prototype, {
 
   getAll: -> _notes
@@ -79,5 +81,10 @@ Dispatcher.register (action) ->
       destroy(action.id)
       NoteStore.emitChange()
 
+    when "NOTE_LOADALL"
+      loadAll()
+      NoteStore.emitChange()
 
+
+loadAll()
 module.exports = NoteStore

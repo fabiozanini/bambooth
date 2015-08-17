@@ -77,9 +77,14 @@ class EvernoteSync
 
 
 main = ->
-  sync = new EvernoteSync()
-  sync.access()
-  sync.syncNotes()
+  #sync = new EvernoteSync()
+  #sync.access()
+  #sync.syncNotes()
+
+  process.send {
+    target: "renderer"
+    message: "reload notes"
+  }
 
 
 module.exports = main

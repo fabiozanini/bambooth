@@ -10,8 +10,11 @@ config = require './config'
 
 
 class EvernoteSync
+  hasToken: ->
+    ('oauthAccessToken' of config.evernoteConfig)
+
   tryAccess: ->
-    if not ('oauthAccessToken' of config.evernoteConfig)
+    if not @hasToken()
       @requestToken()
 
     # FIXME: we should check whether the token is too old
@@ -28,10 +31,15 @@ class EvernoteSync
     @spawnChildProcess()
 
   spawnChildProcess: ->
-    spawn = (require 'child_process').spawn
-    spawn('node',
-          ['evernote-child.js'],
-          {cwd: __dirname, stdio: 'inherit'})
+    fork = (require 'child_process').fork
+    @child = fork('evernote-child.js',
+                  [],
+                  {cwd: __dirname, silent: false})
+    @child.on "message", (msg) =>
+      if msg.target == "renderer"
+        @mainWindow.webContents.send "evernote", msg.message
+      else
+        console.log msg.message
 
   requestToken: ->
     @client = new Evernote.Client {
@@ -109,7 +117,6 @@ class EvernoteSync
       @window.close()
 
       @tryAccess()
-
 
   openWindow: (options) ->
     if options and ("title" of options)

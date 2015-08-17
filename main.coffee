@@ -57,6 +57,7 @@ main = ->
     }
 
     Menu.setApplicationMenu menu
+    EvernoteSync.mainWindow = mainWindow
     
     # WARN: Inspect window should be opened before loading URL
     mainWindow.openDevTools()
