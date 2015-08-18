@@ -38,6 +38,7 @@ main = ->
         {
           label: "Quit"
           click: ->
+            EvernoteSync.killChildProcess()
             app.quit()
         }
       ]
@@ -47,6 +48,7 @@ main = ->
 
   app.on 'window-all-closed', ->
     if process.platform != 'darwin'
+      EvernoteSync.killChildProcess()
       app.quit()
   
   app.on 'ready', ->

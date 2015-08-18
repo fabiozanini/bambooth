@@ -4,50 +4,40 @@ assign = require('object-assign')
 
 Data = require('remote').require('./data')
 
-_notes = []
+_notes = {}
 
 loadAll = ->
-  _notes = Data.loadNotes()
+  _notes = JSON.parse Data.loadNotes()
+
+putAll = (notes) ->
+  _notes = notes
 
 saveAllToFile = ->
-  Data.saveNotes _notes
+  Data.saveNotes JSON.stringify _notes, null, 2
 
-create = (content) ->
-  # Find first unused id, to keep numbers small
-  ids = (note.id for note in _notes)
-  ids.sort()
-  id = 0
-  while ids.indexOf(id) != -1
-    id += 1
+getNewId = ->
+  crypto = require('remote').require('crypto')
+  crypto.randomBytes(20).toString('hex')
 
-  # Date.now() gives back milliseconds, easy to JSON and
-  # JS can reconstruct easily with Date(<ms>)
-  d = Date.now()
+create = (note) ->
+  id = getNewId()
+  while id of _notes
+    id = getNewId()
 
-  _notes.push {
-    "id": id
-    "title": "new note"
-    "content": content
-    "created": d
-    "updated": d
-  }
+  note.id = id
+  _notes[id] = note
   saveAllToFile()
 
 update = (id, updates) ->
-  for note in _notes
-    if note.id == id
-      for key, value of updates
-        note[key] = value
-      note.updated = Date.now()
-      break
+  for key, value of updates
+    _notes[id][key] = value
+  _notes[id].updated = Date.now()
   saveAllToFile()
 
 destroy = (id) ->
-  for note, i in _notes
-    if note.id == id
-      _notes.splice(i, 1)
-      break
+  delete _notes[id]
   saveAllToFile()
+
 
 NoteStore = assign({}, EventEmitter.prototype, {
 
@@ -69,13 +59,11 @@ NoteStore = assign({}, EventEmitter.prototype, {
 Dispatcher.register (action) ->
   switch(action.actionType)
     when "NOTE_CREATE"
-      content = action.content
-      create(content)
+      create(action.note)
       NoteStore.emitChange()
 
     when "NOTE_UPDATE"
-      content = action.content
-      update(action.id, {content: content})
+      update(action.id, action.updates)
       NoteStore.emitChange()
 
     when "NOTE_DESTROY"
@@ -86,6 +74,9 @@ Dispatcher.register (action) ->
       loadAll()
       NoteStore.emitChange()
 
+    when "NOTE_PUTALL"
+      putAll(action.notes)
+      NoteStore.emitChange()
 
 loadAll()
 module.exports = NoteStore

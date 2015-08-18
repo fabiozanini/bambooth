@@ -1,17 +1,17 @@
 Dispatcher = require './dispatcher'
 
 Actions = {
-  createNote: (content) ->
+  createNote: (note) ->
     Dispatcher.dispatch {
       actionType: "NOTE_CREATE"
-      content: content
+      note: note
     }
 
-  updateNote: (id, content) ->
+  updateNote: (id, updates) ->
     Dispatcher.dispatch {
       actionType: "NOTE_UPDATE"
       id: id
-      content: content
+      updates: updates
     }
 
   destroyNote: (id) ->
@@ -23,6 +23,12 @@ Actions = {
   reloadNotes: ->
     Dispatcher.dispatch {
       actionType: "NOTE_LOADALL"
+    }
+
+  putNotes: (notes) ->
+    Dispatcher.dispatch {
+      actionType: "NOTE_PUTALL"
+      notes: notes
     }
 }
 

@@ -23,7 +23,7 @@ Note = React.createClass {
     # NOTE: this does NOT trigger a double update
     # are we sure?
     @setState {editable: false}
-    Actions.updateNote @props.noteId, @state.content
+    Actions.updateNote @props.noteId, {content: @state.content}
 
   toggleEdit: ->
     if @state.editable then @lock() else @edit()
@@ -34,6 +34,13 @@ Note = React.createClass {
   _removeNote: ->
     Actions.destroyNote @props.noteId
 
+  parseContent: (content) ->
+    # TODO: make a better parser :-)
+    startTag = '<en-note>'
+    endTag = '</en-note>'
+    content.slice content.indexOf(startTag)+startTag.length,
+                  content.indexOf(endTag)
+
   render: ->
     if not @state.editable
       return (
@@ -43,7 +50,7 @@ Note = React.createClass {
           <div className="note"
                ref="content"
           >
-          {@state.content}
+          {@parseContent @state.content}
           </div>
         </div>
       )

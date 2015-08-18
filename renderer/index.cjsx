@@ -34,9 +34,22 @@ App = React.createClass {
 
     # Evernote sync
     ipc.on('evernote', (msg) =>
-      switch msg
+      switch msg.action
         when "reload notes"
           Actions.reloadNotes()
+        when "get all notes"
+          ipc.send "evernote", {
+            action: "put all notes"
+            notes: @state.notes
+          }
+        when "put all notes"
+          Actions.putNotes msg.notes
+        when "new note"
+          Actions.createNote msg.note
+        when "update note"
+          Actions.updateNote msg.id, msg.updates
+        when "delete note"
+          Actions.destroyNote msg.id
     )
 
   componentDidMount: ->
@@ -61,12 +74,10 @@ App = React.createClass {
           <Main ref="main" notes={@state.notes}>
           </Main>
         </div>
-        <AddButton ref="addButton" addNote={@_addNote} />
+        <AddButton ref="addButton" />
       </div>
     )
 
-  _addNote: ->
-    Actions.createNote ""
     # FIXME: we should focus on the new note, but somehow there
     # are synchronicity problems with render()
 

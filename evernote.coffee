@@ -1,3 +1,4 @@
+ipc = require 'ipc'
 BrowserWindow = require 'browser-window'
 Evernote = (require 'evernote').Evernote
 
@@ -40,6 +41,13 @@ class EvernoteSync
         @mainWindow.webContents.send "evernote", msg.message
       else
         console.log msg.message
+
+    ipc.on "evernote", (event, message) =>
+      @child.send message
+
+  killChildProcess: ->
+    if @child
+      @child.kill()
 
   requestToken: ->
     @client = new Evernote.Client {

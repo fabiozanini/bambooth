@@ -9,20 +9,31 @@ getConfigFile = ->
 
 getDataFolder = ->
   fn = osenv.home() + '/.local/share/bambooth'
-  # Create data folder if not present
+  # Create folder if not present
   if not fs.existsSync(fn)
     fs.mkdirSync(fn)
   return fn
 
+getNotesFolder = ->
+  getDataFolder()
+
 getNotesFile = ->
-  getDataFolder() + '/notes.json'
+  fn = getNotesFolder() + '/notes.json'
+  # Create if not present
+  if not fs.existsSync(fn)
+    fs.writeFile fn, JSON.stringify({}, null, 2), {'encoding': 'utf8'}
+  return fn
+
+getSyncFile = ->
+  getDataFolder() + '/sync.json'
 
 
 
 class Config
   configFile: getConfigFile()
-  dataFolder: getDataFolder()
+  notesFolder: getNotesFolder()
   notesFile: getNotesFile()
+  syncFile: getSyncFile()
   evernoteConfig: {}
 
   constructor: ->
@@ -40,11 +51,14 @@ class Config
       evernoteConfig: @evernoteConfig
     }
     # Create config folder if not present
-    if not fs.existsSync(getConfigFolder())
-      fs.mkdirSync(getConfigFolder())
+    if not fs.existsSync getConfigFolder()
+      fs.mkdirSync getConfigFolder()
     fs.writeFile(@configFile,
                  (JSON.stringify config, null, 2)
                  {'encoding': 'utf8'})
+
+  hasSyncFile: ->
+    fs.existsSync @syncFile
 
 
 module.exports = new Config()

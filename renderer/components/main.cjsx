@@ -22,12 +22,12 @@ Main = React.createClass {
       <div className="main">
         <div className={(if @state.shrunk then "shrunk" else "")}>
           <section>
-            {@props.notes.map (note) ->
-              <Note ref=("note-"+note.id)
-                    key=note.id
-                    noteId=note.id
-                    noteContent=note.content
-              />
+            {for id, note of @props.notes
+               <Note ref=("note-"+id)
+                     key=id
+                     noteId=id
+                     noteContent=note.content
+               />
             }
           </section>
           <footer></footer>

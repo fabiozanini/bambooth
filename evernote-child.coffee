@@ -4,26 +4,67 @@
 # an additional callback function as a last argument.
 Evernote = (require 'evernote').Evernote
 config = require './config'
-Data = require './data'
+fs = require 'fs'
 
 
 
 class EvernoteSync
+  constructor: ->
+    @addListeners()
+    @getNotesLocal()
+
+  addListeners: ->
+    process.on "message", (message) =>
+      switch message.action
+        when "put all notes"
+          @getNotesLocal(message.notes)
+
   success: ->
-    @saveNotesToFile()
+    @saveSyncToFile()
     process.send {
       target: "renderer"
-      message: "reload notes"
+      message: {
+        action: "reload notes"
+      }
     }
 
-  failure: ->
-    console.log "sync failed"
+  failure: (reason="") ->
+    if reason
+      console.log "sync failed, reason: "+reason
+    else
+      console.log "sync failed"
 
-  getNotesFromFile: ->
-    @notesFile = Data.loadNotes()
+  saveSyncToFile: ->
+    sync = {
+      noteIds: Object.keys(@notes)
+      date: Date.now()
+    }
+    fs.writeFile(config.syncFile,
+                 JSON.stringify(sync, null, 2),
+                 {'encoding': 'utf8'})
 
-  saveNotesToFile: ->
-    Data.saveNotes @notes
+  getSyncFromFile: ->
+    @sync = JSON.parse fs.readFileSync config.syncFile, 'utf8'
+
+  getNotesLocal: (notes=null) ->
+    if notes == null
+      process.send {
+        target: "renderer"
+        message: {
+          action: "get all notes"
+        }
+      }
+    else
+      @notesLocal = notes
+
+  saveNotesLocal: ->
+    process.send {
+      target: "renderer"
+      message: {
+        action: "put all notes"
+        notes: @notes
+      }
+    }
 
   access: ->
       @client = new Evernote.Client {
@@ -37,122 +78,113 @@ class EvernoteSync
       @noteStore = @client.getNoteStore(noteStoreUrl)
       # FIXME: we should check that we get really access
 
-  mergeNotesFromEvernote: ->
-    noteFilter = new Evernote.NoteFilter()
-    options = new Evernote.NotesMetadataResultSpec {
-      includeTitle: true
-      includeContentLength: true
-      includeCreated: true
-      includeUpdated: true
-      includeDeleted: true
-    }
+  syncNotes: ->
+    if not config.hasSyncFile()
+      @syncNotesFirst()
+    else
+      @syncNotesFull()
 
-    @noteStore.findNotesMetadata noteFilter, 0, 100, options,
-    (error, result) =>
+  syncNotesFull: ->
+    console.log "not implemented"
+
+  syncNotesFirst: ->
+    # First download, then upload the missing ones
+    # because the calls are async, follow up is there
+    # (a bit of spaghetti)
+    @downloadAll()
+
+  downloadAll: ->
+    nFilter = new Evernote.NoteFilter {}
+    rSpec = new Evernote.NotesMetadataResultSpec {}
+    @noteStore.findNotesMetadata nFilter, 0, 100, rSpec, (error, nList) =>
       if error
         console.log error
-        return null
+        @failure('download list of notes')
 
-      noteGuids = (note.guid for note in result.notes)
-      @totalNotes = noteGuids.length
-      @mergedNotes = 0
+      else
+        notes = nList.notes
+        @downloadStatus = {
+          'total': nList.totalNotes
+          'missing': notes.totalNotes
+          'success': 0
+          'failure': 0
+        }
 
-      if @totalNotes == 0
-        @mergeNotesToEvernote()
+        @downloadNote note.guid for note in notes
+
+  downloadNote: (guid) ->
+    @noteStore.getNote guid, true, false, false, false, (error, note) =>
+      @downloadStatus.missing -= 1
+      if error
+        console.log error
+        @downloadStatus.failure += 1
+        @failure('download note: '+guid)
         return
 
-      for guid in noteGuids
-        @noteStore.getNote guid, true, false, false, false,
-        (error, note) =>
-          if error
-            console.log error
-            return null
-          @mergeSingleNoteFromEvernote(note)
-
-  mergeNotesToEvernote: ->
-    for note in @notesFile
-      if not ('guid' of note)
-        @addSingleNoteToEvernote(note)
-
-    console.log "add missing notes"
-
-    # FIXME: we should remove notes too...
-    @success()
-
-  mergeSingleNoteFromEvernote: (note) ->
-    found = false
-    for noteLocal in @notesFile
-      if noteLocal.evernoteGuid == note.guid
-        found = true
-        break
-
-    if not found
-      @notes.push {
-        id: note.guid
-        evernoteGuid: note.guid
+      noteLocal = {
         title: note.title
         content: note.content
+        evernoteGuid: note.guid
         created: note.created
         updated: note.updated
       }
-    else
-      if noteLocal.update >= note.update
-        @updateSingleNoteToEvernote(noteLocal)
-      else
-        noteLocal.update = note.update
-        noteLocal.content = note.content
+      process.send {
+        target: "renderer"
+        message: {
+          "action": "new note"
+          "note": noteLocal
+        }
+      }
 
-    @mergedNotes += 1
-    if @mergedNotes == @totalNotes
-      @mergeNotesToEvernote()
+      if @downloadStatus.missing == 0
+        @uploadAll()
 
-  updateSingleNoteToEvernote: (note) ->
-    noteUp = new Evernote.Note {
-      guid: note.guid
-      title: note.title
-      updated: note.updated
-      content: note.content
+
+  uploadAll: ->
+    # Upload local notes, so they get an evernote Guid
+    @uploadStatus = {
+      'total': Object.keys(@notesLocal).length
+      'missing': Object.keys(@notesLocal).length
+      'success': 0
+      'failure': 0
     }
-    @noteStore.updateNote noteUp, (error, metadata) ->
-      if error
-        console.log error
-      console.log "updated in evernote"
-      console.log "guid: "+note.guid
+    for id, note of @notesLocal
+      @uploadNote note
 
-  addSingleNoteToEvernote: (note) ->
-    # FIXME: this is not the way to do it ;-)
-    if note.content[..4] != '<?xml'
-      note.content = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">\n<en-note><div>'+note.content+'</div></en-note>'
-
+  uploadNote: (note) ->
     noteUp = new Evernote.Note {
       title: note.title
-      updated: note.updated
       content: note.content
+      created: note.created
+      updated: note.updated
     }
     @noteStore.createNote noteUp, (error, noteRemote) =>
+      @uploadStatus.missing -= 1
       if error
         console.log error
-      console.log "created in evernote"
-      console.log "guid: "+noteRemote.guid
+        @uploadStatus.failure += 1
+        @failure("note upload failed: "+note.id)
+      else
+        process.send {
+          target: "renderer"
+          message: {
+            action: "update note"
+            id: note.id
+            updates: {
+              evernoteGuid: noteRemote.guid
+            }
+          }
+        }
+        @uploadStatus.success += 1
 
-      # FIXME: this does not work
-      note.guid = noteRemote.guid
-
-  syncNotes: ->
-    @getNotesFromFile()
-
-    @notes = @notesFile
-    
-    # This call is asyncronous
-    @mergeNotesFromEvernote()
+      if @uploadStatus.missing == 0
+        if @uploadStatus.failure > 0
+          @success()
 
 
 main = ->
   sync = new EvernoteSync()
-
   sync.access()
   sync.syncNotes()
-
-
 
 module.exports = main
