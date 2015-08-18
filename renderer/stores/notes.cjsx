@@ -27,6 +27,7 @@ create = (note) ->
   note.id = id
   _notes[id] = note
   saveAllToFile()
+  return id
 
 update = (id, updates) ->
   for key, value of updates

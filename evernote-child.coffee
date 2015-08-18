@@ -17,16 +17,10 @@ class EvernoteSync
     process.on "message", (message) =>
       switch message.action
         when "put all notes"
-          @getNotesLocal(message.notes)
+          @getNotesLocal(message.notes, message.callback)
 
-  success: ->
-    @saveSyncToFile()
-    process.send {
-      target: "renderer"
-      message: {
-        action: "reload notes"
-      }
-    }
+  finalize: ->
+    @getNotesLocal(null, "saveSyncToFile")
 
   failure: (reason="") ->
     if reason
@@ -34,28 +28,31 @@ class EvernoteSync
     else
       console.log "sync failed"
 
+  getSyncFromFile: ->
+    @sync = JSON.parse fs.readFileSync config.syncFile, 'utf8'
+
   saveSyncToFile: ->
     sync = {
-      noteIds: Object.keys(@notes)
+      noteIds: Object.keys(@notesLocal)
       date: Date.now()
     }
     fs.writeFile(config.syncFile,
                  JSON.stringify(sync, null, 2),
                  {'encoding': 'utf8'})
 
-  getSyncFromFile: ->
-    @sync = JSON.parse fs.readFileSync config.syncFile, 'utf8'
-
-  getNotesLocal: (notes=null) ->
+  getNotesLocal: (notes=null, callback=null) ->
     if notes == null
       process.send {
         target: "renderer"
         message: {
           action: "get all notes"
+          callback: callback
         }
       }
     else
       @notesLocal = notes
+      if callback
+        this[callback]()
 
   saveNotesLocal: ->
     process.send {
@@ -105,7 +102,7 @@ class EvernoteSync
         notes = nList.notes
         @downloadStatus = {
           'total': nList.totalNotes
-          'missing': notes.totalNotes
+          'missing': nList.totalNotes
           'success': 0
           'failure': 0
         }
@@ -119,26 +116,26 @@ class EvernoteSync
         console.log error
         @downloadStatus.failure += 1
         @failure('download note: '+guid)
-        return
 
-      noteLocal = {
-        title: note.title
-        content: note.content
-        evernoteGuid: note.guid
-        created: note.created
-        updated: note.updated
-      }
-      process.send {
-        target: "renderer"
-        message: {
-          "action": "new note"
-          "note": noteLocal
+      else
+        @downloadStatus.success += 1
+        noteLocal = {
+          title: note.title
+          content: note.content
+          evernoteGuid: note.guid
+          created: note.created
+          updated: note.updated
         }
-      }
+        process.send {
+          target: "renderer"
+          message: {
+            "action": "new note"
+            "note": noteLocal
+          }
+        }
 
       if @downloadStatus.missing == 0
         @uploadAll()
-
 
   uploadAll: ->
     # Upload local notes, so they get an evernote Guid
@@ -152,12 +149,9 @@ class EvernoteSync
       @uploadNote note
 
   uploadNote: (note) ->
-    noteUp = new Evernote.Note {
-      title: note.title
-      content: note.content
-      created: note.created
-      updated: note.updated
-    }
+    noteUp = new Evernote.Note()
+    noteUp.title = note.title
+    noteUp.content = note.content
     @noteStore.createNote noteUp, (error, noteRemote) =>
       @uploadStatus.missing -= 1
       if error
@@ -178,8 +172,7 @@ class EvernoteSync
         @uploadStatus.success += 1
 
       if @uploadStatus.missing == 0
-        if @uploadStatus.failure > 0
-          @success()
+        @finalize()
 
 
 main = ->

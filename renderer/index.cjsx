@@ -41,6 +41,7 @@ App = React.createClass {
           ipc.send "evernote", {
             action: "put all notes"
             notes: @state.notes
+            callback: msg.callback
           }
         when "put all notes"
           Actions.putNotes msg.notes
