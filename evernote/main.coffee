@@ -1,16 +1,22 @@
 ipc = require 'ipc'
+fork = (require 'child_process').fork
 BrowserWindow = require 'browser-window'
 Evernote = (require 'evernote').Evernote
+
+config = require '../config'
 
 API_CONSUMER_KEY = "iosonofabio"
 API_CONSUMER_SECRET = "7d342d169af0515e"
 API_APPLICATION_NAME = "zen"
 REQUEST_CALLBACK_URL = "file://"+__dirname+"/renderer/about.html"
 
-config = require './config'
 
 
 class EvernoteSync
+  constructor: ->
+    ipc.on "evernote", (event, message) =>
+      @child.send message
+
   hasToken: ->
     ('oauthAccessToken' of config.evernoteConfig)
 
@@ -26,28 +32,33 @@ class EvernoteSync
       @access()
 
   access: ->
-    # NOTE: for some reason, we need to do the heavy-lifting for the
-    # synchronization in a child process. It is a good idea, but why
-    # does it not work otherwise?
-    @spawnChildProcess()
+    # NOTE: we need to do the synchronization in a child process.
+    # It is a good idea, but why does it not work otherwise?
+    if 'child' of this
+      console.log "child process already running. skipping"
+    else
+      @spawnChildProcess()
 
   spawnChildProcess: ->
-    fork = (require 'child_process').fork
-    @child = fork('evernote-child.js',
+    @child = fork('child.js',
                   [],
                   {cwd: __dirname, silent: false})
+
+    # Gateway for IPC between child and renderer
     @child.on "message", (msg) =>
       if msg.target == "renderer"
         @mainWindow.webContents.send "evernote", msg.message
+      else if msg.message.action == "kill child evernote"
+        console.log "parent: killing process"
+        @killChildProcess()
       else
         console.log msg.message
-
-    ipc.on "evernote", (event, message) =>
-      @child.send message
 
   killChildProcess: ->
     if @child
       @child.kill()
+      delete @child
+      console.log @child
 
   requestToken: ->
     @client = new Evernote.Client {
