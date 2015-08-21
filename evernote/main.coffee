@@ -14,8 +14,6 @@ REQUEST_CALLBACK_URL = "file://"+__dirname+"/renderer/about.html"
 
 class EvernoteSync
   constructor: ->
-    ipc.on "evernote", (event, message) =>
-      @child.send message
 
   hasToken: ->
     ('oauthAccessToken' of config.evernoteConfig)
@@ -31,28 +29,55 @@ class EvernoteSync
     else
       @access()
 
-  access: ->
+  access: (force=false) ->
     # NOTE: we need to do the synchronization in a child process.
     # It is a good idea, but why does it not work otherwise?
     if 'child' of this
-      console.log "child process already running. skipping"
+      console.log "parent evernote has child attribute"
+      if force
+        @destroyGateway()
+        @child.kill()
+        delete @child
+        @access()
+
     else
-      @spawnChildProcess()
+      console.log "evernote parent: forking child"
+      @child = fork('child.js',
+                    [],
+                    {cwd: __dirname, silent: false})
 
-  spawnChildProcess: ->
-    @child = fork('child.js',
-                  [],
-                  {cwd: __dirname, silent: false})
+      @child.on 'exit', =>
+        console.log "evernote parent: child exited"
+        @destroyGateway()
+        delete @child
 
-    # Gateway for IPC between child and renderer
-    @child.on "message", (msg) =>
-      if msg.target == "renderer"
-        @mainWindow.webContents.send "evernote", msg.message
-      else if msg.message.action == "kill child evernote"
-        console.log "parent: killing process"
-        @killChildProcess()
-      else
-        console.log msg.message
+      @createGateway()
+
+  createGateway: ->
+    console.log "evernote parent: creating gateway"
+    @child.on "message", @childToRendererGateway
+    ipc.on "evernote", @rendererToChildGateway
+
+  destroyGateway: ->
+    console.log "evernote parent: destroying gateway"
+    @child.removeListener("message", @childToRendererGateway)
+    ipc.removeListener("evernote", @rendererToChildGateway)
+
+  childToRendererGateway: (msg) =>
+    if msg.target == "renderer"
+      console.log "evernote parent: message to renderer:"
+      console.log msg.message
+      @mainWindow.webContents.send "evernote", msg.message
+    else
+      console.log msg.message
+
+  rendererToChildGateway: (event, message) =>
+    if message == "kill"
+      @killChildProcess()
+    else
+      console.log "evernote parent: message to child:"
+      console.log message
+      @child.send message
 
   killChildProcess: ->
     if @child

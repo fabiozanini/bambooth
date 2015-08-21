@@ -13,7 +13,7 @@ Note = require './components/note'
 Dispatcher = require './dispatcher'
 NoteStore = require './stores/notes'
 Actions = require './actions'
-
+require './evernote'
 
 
 
@@ -30,27 +30,6 @@ App = React.createClass {
           @refs.main.toggleSidebar()
         )
         else console.log msg
-    )
-
-    # Evernote sync
-    ipc.on('evernote', (msg) =>
-      switch msg.action
-        when "reload notes"
-          Actions.reloadNotes()
-        when "get all notes"
-          ipc.send "evernote", {
-            action: "put all notes"
-            notes: @state.notes
-            callback: msg.callback
-          }
-        when "put all notes"
-          Actions.putNotes msg.notes
-        when "new note"
-          Actions.createNote msg.note
-        when "update note"
-          Actions.updateNote msg.id, msg.updates
-        when "delete note"
-          Actions.destroyNote msg.id
     )
 
   componentDidMount: ->
