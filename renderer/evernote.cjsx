@@ -10,14 +10,17 @@ main = ->
       when "reload notes"
         Actions.reloadNotes()
       when "get all notes"
-        ipc.send "evernote", {
-          action: "put all notes"
+        ipc.send "evernote",
+          action: "get all notes"
           notes: NoteStore.getAll()
-        }
       when "put all notes"
+        ipc.send "evernote",
+          action: "put all notes"
         Actions.putNotes msg.notes
       when "new note"
         Actions.createNote msg.note
+      when "new notes"
+        Actions.createNotes msg.notes
       when "update note"
         Actions.updateNote msg.id, msg.updates
       when "delete note"

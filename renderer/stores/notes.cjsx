@@ -10,7 +10,11 @@ loadAll = ->
   _notes = JSON.parse Data.loadNotes()
 
 putAll = (notes) ->
-  _notes = notes
+  _notes = {}
+  for note in notes
+    if not ('id' of note)
+      note.id = getNewId()
+    _notes[note.id] = note
 
 saveAllToFile = ->
   Data.saveNotes JSON.stringify _notes, null, 2
@@ -42,7 +46,19 @@ destroy = (id) ->
 
 NoteStore = assign({}, EventEmitter.prototype, {
 
-  getAll: -> _notes
+  getAll: (copy=false) ->
+    console.log "NoteStore: get all notes"
+    if not copy
+      return _notes
+    else
+      notes = {}
+      for id, _note of _notes
+        note = {}
+        for key, value of _note
+          note[key] = value
+        notes[id] = note
+      return notes
+
 
   emitChange: ->
     @emit("change")
@@ -61,6 +77,10 @@ Dispatcher.register (action) ->
   switch(action.actionType)
     when "NOTE_CREATE"
       create(action.note)
+      NoteStore.emitChange()
+
+    when "NOTES_CREATE"
+      create(note) for note in action.notes
       NoteStore.emitChange()
 
     when "NOTE_UPDATE"

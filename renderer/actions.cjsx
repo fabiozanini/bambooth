@@ -7,6 +7,12 @@ Actions = {
       note: note
     }
 
+  createNotes: (notes) ->
+    Dispatcher.dispatch {
+      actionType: "NOTES_CREATE"
+      notes: notes
+    }
+
   updateNote: (id, updates) ->
     Dispatcher.dispatch {
       actionType: "NOTE_UPDATE"
