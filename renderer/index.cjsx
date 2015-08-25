@@ -19,21 +19,29 @@ require './evernote'
 
 App = React.createClass {
   getInitialState: ->
-    {notes: NoteStore.getAll()}
-
-  componentWillMount: ->
-    # Toggle sidebar via menu
-    ipc.on('sidebar', (msg) =>
-      switch msg
-        when "toggle" then (
-          @refs.sidebar.toggle()
-          @refs.main.toggleSidebar()
-        )
-        else console.log msg
-    )
+    {
+      notes: NoteStore.getAll()
+      curtain: false
+    }
 
   componentDidMount: ->
     NoteStore.addChangeListener @_onChange
+
+    # Toggle sidebar via menu
+    ipc.on 'sidebar', (msg) =>
+      switch msg
+        when "toggle"
+          if @state.curtain
+            console.log "cannot change sidebar during curtain"
+          else
+            @refs.sidebar.toggle()
+            @refs.main.toggleSidebar()
+        else console.log msg
+        
+    ipc.on 'curtain', (msg) =>
+      switch msg
+        when true then @setState {curtain: true}
+        when false then @setState {curtain: false}
 
   componentWillUnmount: ->
     NoteStore.removeChangeListener @_onChange
@@ -47,6 +55,8 @@ App = React.createClass {
   render: ->
     return (
       <div>
+        <div id="curtain"
+             className={if @state.curtain then "active" else ""}/>
         <div>
           <Sidebar ref="sidebar">
             <SidebarItem hash="first-notebook">My Notebook</SidebarItem>

@@ -59,7 +59,7 @@ main = ->
     ]
     
     # WARN: Inspect window should be opened before loading URL
-    #mainWindow.openDevTools()
+    mainWindow.openDevTools()
   
     mainWindow.loadUrl "file://"+__dirname+"/renderer/index.html"
 

@@ -19,6 +19,7 @@ class EvernoteSync
     ('oauthAccessToken' of config.evernoteConfig)
 
   tryAccess: ->
+    @setCurtain true
     if not @hasToken()
       @requestToken()
 
@@ -38,6 +39,7 @@ class EvernoteSync
         @destroyGateway()
         @child.kill()
         delete @child
+        @setCurtain false
         @access()
 
     else
@@ -50,6 +52,7 @@ class EvernoteSync
         console.log "evernote parent: child exited"
         @destroyGateway()
         delete @child
+        @setCurtain false
 
       @createGateway()
 
@@ -159,8 +162,7 @@ class EvernoteSync
       config.writeToFile()
 
       @window.close()
-
-      @tryAccess()
+      @access()
 
   openWindow: (options) ->
     if options and ("title" of options)
@@ -180,6 +182,9 @@ class EvernoteSync
 
     if options and ("url" of options)
       @window.loadUrl options.url
-    
+
+  setCurtain: (state) ->
+    console.log "evernote parent: set curtain: "+state
+    @mainWindow.webContents.send "curtain", state
 
 module.exports = new EvernoteSync()

@@ -152,7 +152,7 @@ body {
  .remove-note-btn {
   position: absolute;
   right: 0px;
-  z-index: 1000;
+  z-index: 99;
   margin-right: @new-note-margin+5px;
   margin-top: 6px;
 
@@ -179,7 +179,7 @@ body {
   position: fixed;
   bottom: 0px;
   right: 0px;
-  z-index: 1000;
+  z-index: 100;
   margin-bottom: @new-note-margin;
   //FIXME: make space for scrollbar
   margin-right: @new-note-margin+5px;
@@ -202,4 +202,21 @@ body {
    }
   }
  }
+
+ #curtain {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+  background: #000000;
+  opacity: 0;
+  z-index: 1000;
+  .transition(all 300ms ease);
+
+  &.active {
+    visibility: visible;
+    opacity: 0.5;
+  }
+ }
+
 }

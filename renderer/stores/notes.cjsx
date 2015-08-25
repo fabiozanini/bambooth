@@ -47,7 +47,6 @@ destroy = (id) ->
 NoteStore = assign({}, EventEmitter.prototype, {
 
   getAll: (copy=false) ->
-    console.log "NoteStore: get all notes"
     if not copy
       return _notes
     else
