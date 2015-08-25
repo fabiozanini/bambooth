@@ -36,10 +36,7 @@ Note = React.createClass {
 
   parseContent: (content) ->
     # TODO: make a better parser :-)
-    startTag = '<en-note>'
-    endTag = '</en-note>'
-    content.slice content.indexOf(startTag)+startTag.length,
-                  content.indexOf(endTag)
+    content
 
   render: ->
     if not @state.editable

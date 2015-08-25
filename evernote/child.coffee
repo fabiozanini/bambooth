@@ -4,6 +4,7 @@
 # an additional callback function as a last argument.
 Evernote = (require 'evernote').Evernote
 NoteStore = require './noteStore'
+NoteLens = require './noteLens'
 config = require '../config'
 fs = require 'fs'
 
@@ -172,7 +173,7 @@ class EvernoteSync
     console.log "create remotely note: "+note.id
     noteUp = new Evernote.Note
       title: note.title
-      content: note.content
+      content: NoteLens.BamboothToENML note.content
     @storeRemote.createNote noteUp, (error, noteRemote) =>
       if error
         console.log error
@@ -200,7 +201,7 @@ class EvernoteSync
       else
         note =
           title: noteRemote.title
-          content: noteRemote.content
+          content: NoteLens.ENMLToBambooth noteRemote.content
           created: noteRemote.created
           updated: noteRemote.updated
           evernoteGuid: noteRemote.guid
@@ -218,7 +219,7 @@ class EvernoteSync
       guid: note.evernoteGuid
       title: note.title
       updated: note.updated
-      content: note.content
+      content: NoteLens.BamboothToENML note.content
     @storeRemote.updateNote noteUp, (error, updated) =>
       if error
         console.log error
@@ -244,7 +245,7 @@ class EvernoteSync
         @status.createLocal.failure += 1
         @failure('download note: '+guid)
       else
-        note.content = noteRemote.content
+        note.content = NoteLens.ENMLToBambooth noteRemote.content
         note.updated = noteRemote.updated
         @status.notes.push note
         @status.sync.noteGuids.push note.evernoteGuid
