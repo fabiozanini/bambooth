@@ -17,7 +17,7 @@ AddButton = React.createClass {
     d = Date.now()
     Actions.createNote {
       title: "new note"
-      content: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\"><en-note>new note</en-note>"
+      content: "new note"
       created: d
       updated: d
     }
