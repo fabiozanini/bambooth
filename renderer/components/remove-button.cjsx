@@ -6,12 +6,8 @@ RemoveButton = React.createClass {
     {isHovering: false}
 
   render: ->
-    divStyle = {
-      top: @props.top
-    }
     return (
       <div className="remove-note-btn"
-           style={divStyle}
       >
         <img className="remove-note-btn-img"
              src="./images/minus.png"

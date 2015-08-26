@@ -112,6 +112,38 @@ body {
    &.shrunk {
     margin-left: @sidebar-width
    }
+   
+   .note-container {
+    position: relative;
+
+    >.remove-note-btn {
+     position: absolute;
+     right: 0px;
+     top:0px;
+     z-index: 99;
+     margin-right: @new-note-margin+5px;
+     margin-top: 6px;
+
+     .remove-note-btn-img {
+      .border-radius(24px);
+      .box-shadow(3px 3px 3px @shadow-color);
+      .transition(all 150ms ease);
+
+      &:hover {
+       .box-shadow(5px 5px 5px @shadow-color);
+       .transition(all 250ms ease);
+       .transform(translateY(-5px));
+      }
+
+      &:active {
+       .box-shadow(9px 9px 9px @shadow-color);
+       .transition(all 30ms ease);
+       .transform(translateY(-9px));
+      }
+     }
+    }
+
+   }
 
    .note {
     border: 2px solid @shadow-color;
@@ -145,32 +177,6 @@ body {
     &:focus {
      outline:none;
     }
-   }
-  }
- }
-
- .remove-note-btn {
-  position: absolute;
-  right: 0px;
-  z-index: 99;
-  margin-right: @new-note-margin+5px;
-  margin-top: 6px;
-
-  .remove-note-btn-img {
-   .border-radius(24px);
-   .box-shadow(3px 3px 3px @shadow-color);
-   .transition(all 150ms ease);
-
-   &:hover {
-    .box-shadow(5px 5px 5px @shadow-color);
-    .transition(all 250ms ease);
-    .transform(translateY(-5px));
-   }
-
-   &:active {
-    .box-shadow(9px 9px 9px @shadow-color);
-    .transition(all 30ms ease);
-    .transform(translateY(-9px));
    }
   }
  }

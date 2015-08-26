@@ -10,12 +10,6 @@ Note = React.createClass {
       position: null
     }
 
-  componentDidMount: ->
-    @rect = React.findDOMNode(@refs.content).getBoundingClientRect()
-
-  componentDidUpdate: ->
-    @rect = React.findDOMNode(@refs.content).getBoundingClientRect()
-
   edit: ->
     @setState {editable: true}
 
@@ -41,7 +35,8 @@ Note = React.createClass {
   render: ->
     if not @state.editable
       return (
-        <div onMouseEnter={@edit}
+        <div className="note-container"
+             onMouseEnter={@edit}
              onMouseLeave={@lock}
         >
           <div className="note"
@@ -53,7 +48,8 @@ Note = React.createClass {
       )
     else
       return (
-        <div onMouseEnter={@edit}
+        <div className="note-container"
+             onMouseEnter={@edit}
              onMouseLeave={@lock}
         >
           <textarea className="note"
@@ -63,7 +59,6 @@ Note = React.createClass {
                onChange={@handleChange}
           />
           <RemoveButton ref="removeButton"
-                        top={@rect.top}
                         removeNote={@_removeNote}
           />
         </div>
