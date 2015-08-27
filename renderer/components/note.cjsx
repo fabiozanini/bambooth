@@ -1,8 +1,8 @@
 React = require 'react'
 Actions = require '../actions'
-RemoveButton = require './remove-button'
+NoteButtons = require './note-buttons'
 
-Note = React.createClass {
+Note = React.createClass
   getInitialState: ->
     {
       editable: false
@@ -24,6 +24,9 @@ Note = React.createClass {
 
   handleChange: (event) ->
     @setState {content: event.target.value}
+
+  _insertImage: ->
+    console.log "insert image"
 
   _removeNote: ->
     Actions.destroyNote @props.noteId
@@ -52,17 +55,17 @@ Note = React.createClass {
              onMouseEnter={@edit}
              onMouseLeave={@lock}
         >
+          <NoteButtons buttons="insert-image,remove"
+                       removeNote={@_removeNote}
+                       insertImage={@_insertImage}
+          />
           <textarea className="note"
                ref="content"
                type="text"
                value={@state.content}
                onChange={@handleChange}
           />
-          <RemoveButton ref="removeButton"
-                        removeNote={@_removeNote}
-          />
         </div>
       )
-}
 
 module.exports = Note
