@@ -16,9 +16,9 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="insert-image.svg"
-   inkscape:export-filename="/home/fabio/programmi/projects/bambooth/renderer/images/minus.png"
-   inkscape:export-xdpi="28.501417"
-   inkscape:export-ydpi="28.501417">
+   inkscape:export-filename="/home/fabio/programmi/projects/bambooth/renderer/images/insert-image.png"
+   inkscape:export-xdpi="28.501419"
+   inkscape:export-ydpi="28.501419">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -29,7 +29,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="-167.44969"
+     inkscape:cx="-85.627334"
      inkscape:cy="116.601"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -51,7 +51,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -61,7 +61,7 @@
      id="layer1"
      transform="translate(-172.78571,-170.86221)">
     <circle
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#d7f2ff;fill-opacity:1;fill-rule:nonzero;stroke:#555555;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#d4ff2a;fill-opacity:1;fill-rule:nonzero;stroke:#555555;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
        id="path4136"
        cx="248.57143"
        cy="246.64792"

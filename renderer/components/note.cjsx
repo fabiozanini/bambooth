@@ -25,6 +25,12 @@ Note = React.createClass
   handleChange: (event) ->
     @setState {content: event.target.value}
 
+  _editNote: ->
+    console.log "edit note"
+
+  _saveNote: ->
+    console.log "save note"
+
   _insertImage: ->
     console.log "insert image"
 
@@ -55,9 +61,10 @@ Note = React.createClass
              onMouseEnter={@edit}
              onMouseLeave={@lock}
         >
-          <NoteButtons buttons="insert-image,remove"
-                       removeNote={@_removeNote}
-                       insertImage={@_insertImage}
+          <NoteButtons buttons="save,insert-image,remove"
+                       saveCallback={@_saveNote}
+                       removeCallback={@_removeNote}
+                       insertImageCallback={@_insertImage}
           />
           <textarea className="note"
                ref="content"
