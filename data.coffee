@@ -4,18 +4,22 @@ Config = require './config'
 
 
 class Data
-  # NOTE: there is a problem sending objects to/from renderer
   @loadNotes: ->
-    fs.readFileSync Config.notesFile, 'utf8'
+    notes = {}
+    for fn in Config.getNotesFiles()
+      note = JSON.parse fs.readFileSync fn, 'utf8'
+      notes[note.id] = note
+    JSON.stringify notes, null, 2
 
   @saveNotes: (notesString) ->
-    fs.writeFile(Config.notesFile,
-                 notesString,
-                 {'encoding': 'utf8'})
+    notes = JSON.parse notesString
+    for id, note of notes
+      fs.writeFileSync(Config.getNoteFile(id),
+                       JSON.stringify note,
+                       {'encoding': 'utf8'})
 
   @loadNote: (id) ->
-    notes = JSON.parse fs.readFileSync Config.notesFile, 'utf8'
-    JSON.stringify notes[id], null, 2
+    fs.readFileSync Config.getNoteFile(id), 'utf8'
 
 
 module.exports = Data

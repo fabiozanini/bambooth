@@ -15,14 +15,18 @@ getDataFolder = ->
   return fn
 
 getNotesFolder = ->
-  getDataFolder()
-
-getNotesFile = ->
-  fn = getNotesFolder() + '/notes.json'
-  # Create if not present
+  fn = getDataFolder()+'/notes'
+  # Create folder if not present
   if not fs.existsSync(fn)
-    fs.writeFile fn, JSON.stringify({}, null, 2), {'encoding': 'utf8'}
+    fs.mkdirSync(fn)
   return fn
+
+getNotesFiles = ->
+  fn = getNotesFolder()
+  (fn + '/' + fnLocal for fnLocal in fs.readdirSync fn)
+
+getNoteFile = (id) ->
+  getNotesFolder()+'/'+id+'.json'
 
 getSyncFile = ->
   getDataFolder() + '/sync.json'
@@ -31,8 +35,6 @@ getSyncFile = ->
 
 class Config
   configFile: getConfigFile()
-  notesFolder: getNotesFolder()
-  notesFile: getNotesFile()
   syncFile: getSyncFile()
   evernoteConfig: {}
 
@@ -59,6 +61,12 @@ class Config
 
   hasSyncFile: ->
     fs.existsSync @syncFile
+
+  getNotesFiles: ->
+    getNotesFiles()
+
+  getNoteFile: (id) ->
+    getNoteFile(id)
 
 
 module.exports = new Config()
