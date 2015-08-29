@@ -11,7 +11,8 @@ loadAll = ->
 
 putAll = (notes) ->
   _notes = {}
-  for note in notes
+  for note, i in notes
+    note.position = i+1
     if not ('id' of note)
       note.id = getNewId()
     _notes[note.id] = note
@@ -29,6 +30,7 @@ create = (note) ->
     id = getNewId()
 
   note.id = id
+  note.position = Object.keys(_notes).length + 1
   _notes[id] = note
   saveAllToFile()
   return id
@@ -40,22 +42,44 @@ update = (id, updates) ->
   saveAllToFile()
 
 destroy = (id) ->
+  position = _notes[id].position
   delete _notes[id]
+  for id, note of _notes
+    if note.position > position
+      note.position -= 1
   saveAllToFile()
+
+up = (id) ->
+  note = _notes[id]
+  position = note.position
+  if position == 1
+    return
+  note.position -= 1
+  for idTmp, note of _notes
+    if (id != idTmp) and (note.position == position - 1)
+      note.position += 1
+      break
+
+down = (id) ->
+  note = _notes[id]
+  position = note.position
+  if position == Object.keys(_notes).length
+    return
+  note.position += 1
+  for idTmp, note of _notes
+    if (id != idTmp) and (note.position == position + 1)
+      note.position -= 1
+      break
 
 
 NoteStore = assign({}, EventEmitter.prototype, {
 
-  getAll: (copy=false) ->
-    if not copy
+  getAll: (array=false) ->
+    if not array
       return _notes
     else
-      notes = {}
-      for id, _note of _notes
-        note = {}
-        for key, value of _note
-          note[key] = value
-        notes[id] = note
+      notes = (note for id, note of _notes)
+      notes.sort (a, b) -> if a.position > b.position then 1 else -1
       return notes
 
 
@@ -96,6 +120,14 @@ Dispatcher.register (action) ->
 
     when "NOTE_PUTALL"
       putAll(action.notes)
+      NoteStore.emitChange()
+
+    when "NOTE_UP"
+      up(action.id)
+      NoteStore.emitChange()
+
+    when "NOTE_DOWN"
+      down(action.id)
       NoteStore.emitChange()
 
 loadAll()

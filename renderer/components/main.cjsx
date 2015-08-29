@@ -22,10 +22,10 @@ Main = React.createClass {
       <div className="main">
         <div className={(if @state.shrunk then "shrunk" else "")}>
           <section>
-            {for id, note of @props.notes
-               <Note ref=("note-"+id)
-                     key=id
-                     noteId=id
+            {for note in @props.notes
+               <Note ref=("note-"+note.id)
+                     key=note.id
+                     noteId=note.id
                      noteContent=note.content
                />
             }

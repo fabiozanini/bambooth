@@ -20,7 +20,7 @@ require './evernote'
 App = React.createClass {
   getInitialState: ->
     {
-      notes: NoteStore.getAll()
+      notes: NoteStore.getAll(array=true)
       curtain: false
     }
 
@@ -50,7 +50,7 @@ App = React.createClass {
     # On change, we regenerate the whole view
     # (React will take care of what needs rendering via
     # its fast diff algorithm)
-    @setState {notes: NoteStore.getAll()}
+    @setState {notes: NoteStore.getAll(array=true)}
 
   render: ->
     return (
