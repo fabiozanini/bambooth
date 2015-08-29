@@ -7,7 +7,6 @@ Note = React.createClass
     {
       editable: false
       content: @props.noteContent
-      position: null
     }
 
   edit: ->
@@ -24,6 +23,12 @@ Note = React.createClass
 
   handleChange: (event) ->
     @setState {content: event.target.value}
+
+  _downNote: ->
+    console.log "down note"
+
+  _upNote: ->
+    console.log "up note"
 
   _editNote: ->
     console.log "edit note"
@@ -61,7 +66,9 @@ Note = React.createClass
              onMouseEnter={@edit}
              onMouseLeave={@lock}
         >
-          <NoteButtons buttons="save,insert-image,remove"
+          <NoteButtons buttons="up,down,save,insert-image,remove"
+                       upCallback={@_upNote}
+                       downCallback={@_downNote}
                        saveCallback={@_saveNote}
                        removeCallback={@_removeNote}
                        insertImageCallback={@_insertImage}

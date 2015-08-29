@@ -6,6 +6,16 @@ NoteButtons = React.createClass
   setButtons: ->
     @buttons = @props.buttons.split(',')
     @buttonDivs = []
+    if @buttons.indexOf('up') != -1
+      @buttonDivs.push <Button key="up"
+                               classes="up-note-btn"
+                               icon="up.png"
+                               callback=@props.upCallback />
+    if @buttons.indexOf('down') != -1
+      @buttonDivs.push <Button key="down"
+                               classes="down-note-btn"
+                               icon="down.png"
+                               callback=@props.downCallback />
     if @buttons.indexOf('save') != -1
       @buttonDivs.push <Button key="save"
                                classes="save-note-btn"
